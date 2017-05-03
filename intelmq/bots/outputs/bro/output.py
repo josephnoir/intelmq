@@ -37,7 +37,7 @@ class BroBot(Bot):
                "feed.url"               : "string",
                "source.ip"              : "addr"}
 
-    header = ("#separator \x09\n"
+    header = ("#separator \\x09\n"
               "#set_separator	,\n"
               "#empty_field	(empty)\n"
               "#unset_field	-\n"
@@ -85,6 +85,7 @@ class BroBot(Bot):
             self.acknowledge_message()
 
     def shutdown(self):
+        self.file.write("#close 2014-05-23-18-02-05")
         io.close(self.file)
         self.logger.info("File %r is closed." % self.parameters.file)
         self.logger.info("Shutting down Bro bot.")
