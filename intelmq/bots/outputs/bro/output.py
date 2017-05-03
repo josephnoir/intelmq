@@ -62,7 +62,7 @@ class BroBot(Bot):
             self.file.write("\n")
             self.flush()
 
-        except FileNotFoundError;
+        except FileNotFoundError:
             self.logger.info("Failed to open %r." % self.parameters.file)
 
     def process(self):
@@ -72,7 +72,7 @@ class BroBot(Bot):
         for e,_ in self.entries:
             if e in event_dict:
                 line += "\t" + str(event_dict[e])
-            else
+            else:
                 line += "\t-"
         try:
             self.file.write(line)
