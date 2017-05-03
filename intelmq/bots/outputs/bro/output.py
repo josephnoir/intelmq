@@ -45,6 +45,7 @@ class BroBot(Bot):
              """
 
     def init(self):
+        self.logger.info("Starging Bro bot.")
         self.logger.debug("Opening %r file." % self.parameters.file)
         self.file = io.open(self.parameters.file, mode='at', encoding="utf-8")
         self.logger.info("File %r is open." % self.parameters.file)
@@ -70,7 +71,7 @@ class BroBot(Bot):
         line = ""
         for e,_ in entries:
             if e in event_dict:
-                line += "\t"
+                line += "\t" + str(event_dict[e])
             else
                 line += "\t-"
         try:
@@ -81,6 +82,11 @@ class BroBot(Bot):
             self.init()
         else:
             self.acknowledge_message()
+
+    def shutdown(self):
+        io.close(self.file)
+        self.logger.info("File %r is closed." % self.parameters.file)
+        self.logger.info("Shutting down Bro bot.")
 
 
 BOT = BroBot
