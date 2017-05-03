@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import sys
+import io
 
 # imports for additional libraries and intelmq
 from intelmq.lib.bot import Bot
@@ -36,16 +37,14 @@ class BroBot(Bot):
                "feed.url"               : "string",
                "source.ip"              : "addr"}
 
-    header = """#separator \x09
-                #set_separator	,
-                #empty_field	(empty)
-                #unset_field	-
-                #path	blacklist
-                #open	2014-05-23-18-02-04
-             """
+    header = ("#separator \x09\n"
+              "#set_separator	,\n"
+              "#empty_field	(empty)\n"
+              "#unset_field	-\n"
+              "#path	blacklist\n"
+              "#open	2014-05-23-18-02-04\n")
 
     def init(self):
-        self.logger.info("Starting Bro bot.")
         self.logger.debug("Opening %r file." % self.parameters.file)
         self.file = io.open(self.parameters.file, mode='at', encoding="utf-8")
         self.logger.info("File %r is open." % self.parameters.file)
@@ -53,14 +52,14 @@ class BroBot(Bot):
             self.file.write(self.header)
             fields = "#fields"
             types = "#types"
-            for f, t in self.entries:
+            for f, t in sorted(self.entries.items()):
                 fields += "\t" + f
                 types += "\t" + t
             self.file.write(fields)
             self.file.write("\n")
             self.file.write(types)
             self.file.write("\n")
-            self.flush()
+            self.file.flush()
 
         except FileNotFoundError:
             self.logger.info("Failed to open %r." % self.parameters.file)
@@ -69,11 +68,13 @@ class BroBot(Bot):
         event = self.receive_message()
         event_dict = event.to_dict(hierarchical=False)
         line = ""
-        for e,_ in self.entries:
+        for e,_ in sorted(self.entries.items()):
+            if line != "":
+                line += '\t'
             if e in event_dict:
-                line += "\t" + str(event_dict[e])
+                line += str(event_dict[e])
             else:
-                line += "\t-"
+                line += '-'
         try:
             self.file.write(line)
             self.file.write("\n")
