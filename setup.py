@@ -35,7 +35,9 @@ DATA = [
      [],
      ),
     ('/opt/intelmq/var/lib/bots/file-output/',
-     '/opt/intelmq/var/lib/bots/bro-output/',
+     [],
+     ),
+    ('/opt/intelmq/var/lib/bots/bro-output/',
      [],
      ),
 ]

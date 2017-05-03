@@ -45,15 +45,15 @@ class BroBot(Bot):
              """
 
     def init(self):
-        self.logger.info("Starging Bro bot.")
+        self.logger.info("Starting Bro bot.")
         self.logger.debug("Opening %r file." % self.parameters.file)
         self.file = io.open(self.parameters.file, mode='at', encoding="utf-8")
         self.logger.info("File %r is open." % self.parameters.file)
         try:
-            self.file.write(header)
+            self.file.write(self.header)
             fields = "#fields"
             types = "#types"
-            for f, t in entries:
+            for f, t in self.entries:
                 fields += "\t" + f
                 types += "\t" + t
             self.file.write(fields)
@@ -69,7 +69,7 @@ class BroBot(Bot):
         event = self.receive_message()
         event_dict = event.to_dict(hierarchical=False)
         line = ""
-        for e,_ in entries:
+        for e,_ in self.entries:
             if e in event_dict:
                 line += "\t" + str(event_dict[e])
             else
