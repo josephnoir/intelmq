@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 import sys
 import io
+import datetime
+import dateutil.parser
 
 # imports for additional libraries and intelmq
 from intelmq.lib.bot import Bot
@@ -68,11 +70,16 @@ class BroBot(Bot):
         event = self.receive_message()
         event_dict = event.to_dict(hierarchical=False)
         line = ""
-        for e,_ in sorted(self.entries.items()):
+        for f,t in sorted(self.entries.items()):
             if line != "":
                 line += '\t'
-            if e in event_dict:
-                line += str(event_dict[e])
+            if f in event_dict:
+                if t == "time":
+                    ts = event_dict[f]
+                    dt = dateutil.parser.parse(ts)
+                    line += dt.strftime('%s.0')
+                else:
+                    line += str(event_dict[f])
             else:
                 line += '-'
         try:
