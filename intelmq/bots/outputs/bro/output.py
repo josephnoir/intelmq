@@ -39,19 +39,18 @@ class BroBot(Bot):
                "feed.url"               : "string",
                "source.ip"              : "addr"}
 
-    header = ("#separator \\x09\n"
-              "#set_separator	,\n"
-              "#empty_field	(empty)\n"
-              "#unset_field	-\n"
-              "#path	blacklist\n"
-              "#open	2014-05-23-18-02-04\n")
-
     def init(self):
         self.logger.debug("Opening %r file." % self.parameters.file)
         self.file = io.open(self.parameters.file, mode='at', encoding="utf-8")
         self.logger.info("File %r is open." % self.parameters.file)
         try:
-            self.file.write(self.header)
+
+            self.file.write("#separator \\x09\n")
+            self.file.write("#set_separator\t,\n")
+            self.file.write("#empty_field\t(empty)\n")
+            self.file.write("#unset_field\t-\n")
+            self.file.write("#path\tblacklist\n")
+            self.file.write("#open\t{}\n".format(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')))
             fields = "#fields"
             types = "#types"
             for f, t in sorted(self.entries.items()):
@@ -92,7 +91,7 @@ class BroBot(Bot):
             self.acknowledge_message()
 
     def shutdown(self):
-        self.file.write("#close 2014-05-23-18-02-05")
+        self.file.write("#close\t{}\n".format(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')))
         io.close(self.file)
         self.logger.info("File %r is closed." % self.parameters.file)
         self.logger.info("Shutting down Bro bot.")
