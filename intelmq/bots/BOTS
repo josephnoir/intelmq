@@ -734,7 +734,7 @@
             "description": "Bro is the bot responsible to send events to a file formated as a Bro log.",
             "module": "intelmq.bots.outputs.bro.output",
             "parameters": {
-                "file": "/opt/intelmq/var/lib/bots/bro-output/events.log",
+                "file": "/opt/intelmq/var/lib/bots/bro-output/%t_events.log",
                 "hierarchical_output": false
             }
         }

@@ -40,11 +40,12 @@ class BroBot(Bot):
                "source.ip"              : "addr"}
 
     def init(self):
-        self.logger.debug("Opening %r file." % self.parameters.file)
-        self.file = io.open(self.parameters.file, mode='at', encoding="utf-8")
-        self.logger.info("File %r is open." % self.parameters.file)
+        self.last_ts = datetime.datetime.now()
+        filename = self.parameters.file.replace('%t',self.last_ts.strftime('%Y-%m-%d-%H-%M-%S'))
+        self.logger.debug("Opening %r file." % filename)
+        self.file = io.open(filename, mode='at', encoding="utf-8")
+        self.logger.info("File %r is open." % filename)
         try:
-
             self.file.write("#separator \\x09\n")
             self.file.write("#set_separator\t,\n")
             self.file.write("#empty_field\t(empty)\n")
@@ -56,16 +57,20 @@ class BroBot(Bot):
             for f, t in sorted(self.entries.items()):
                 fields += "\t" + f
                 types += "\t" + t
+            # temporary fix because ...
+            fields = fields.replace('.',':')
             self.file.write(fields)
             self.file.write("\n")
             self.file.write(types)
             self.file.write("\n")
             self.file.flush()
-
         except FileNotFoundError:
-            self.logger.info("Failed to open %r." % self.parameters.file)
+            self.logger.info("Failed to open %r." % filename)
 
     def process(self):
+        if (datetime.datetime.now() - self.last_ts).seconds > 3600:
+            self.close_file()
+            self.init()
         event = self.receive_message()
         event_dict = event.to_dict(hierarchical=False)
         line = ""
@@ -91,10 +96,15 @@ class BroBot(Bot):
             self.acknowledge_message()
 
     def shutdown(self):
-        self.file.write("#close\t{}\n".format(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')))
-        io.close(self.file)
-        self.logger.info("File %r is closed." % self.parameters.file)
+        self.close_file()
         self.logger.info("Shutting down Bro bot.")
 
+    def close_file(self):
+        try:
+            self.file.write("#close\t{}\n".format(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')))
+            self.file.close()
+        except FileNotFoundError:
+            self.logger.info("No File to close")
+        self.logger.info("File %r is closed." % self.parameters.file)
 
 BOT = BroBot
