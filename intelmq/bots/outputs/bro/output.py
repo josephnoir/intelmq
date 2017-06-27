@@ -58,7 +58,6 @@ class BroBot(Bot):
                 fields += "\t" + f
                 types += "\t" + t
             # temporary fix because ...
-            fields = fields.replace('.',':')
             self.file.write(fields)
             self.file.write("\n")
             self.file.write(types)
